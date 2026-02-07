@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ski Camp Rausor 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --night: #0c1829;
+  --deep: #13243d;
+  --ridge: #1b3556;
+  --sky: #2a5f9e;
+  --ice: #4a9cd8;
+  --glow: #6fc3f7;
+  --snow: #e8f0f8;
+  --peak: #f4f7fb;
+  --white: #ffffff;
+  --ember: #e85d3a;
+  --ember-glow: #ff7b5c;
+  --text: #1e2d42;
+  --muted: #5a7189;
+  --faint: #94a7bc;
+  --line: #d4dfe9;
+  --card-bg: rgba(255,255,255,0.85);
+  --glass: rgba(255,255,255,0.12);
+  --radius: 14px;
+  --radius-sm: 10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--peak);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ═══ HERO ═══ */
+.hero{position:relative;min-height:420px;background:linear-gradient(165deg,var(--night) 0%,var(--deep) 30%,var(--ridge) 60%,var(--sky) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 1.5rem 5rem;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,.6),transparent),radial-gradient(1px 1px at 25% 35%,rgba(255,255,255,.4),transparent),radial-gradient(1.5px 1.5px at 40% 8%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 55% 25%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 70% 12%,rgba(255,255,255,.5),transparent),radial-gradient(1.5px 1.5px at 85% 30%,rgba(255,255,255,.6),transparent),radial-gradient(1px 1px at 92% 18%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 15% 45%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 60% 40%,rgba(255,255,255,.5),transparent);animation:twinkle 4s ease-in-out infinite alternate;pointer-events:none}
+@keyframes twinkle{0%{opacity:.6}100%{opacity:1}}
+
+.mountains{position:absolute;bottom:0;left:0;right:0;height:180px;pointer-events:none}
+.mountains svg{width:100%;height:100%;display:block}
+
+.snow-container{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden}
+.snowflake{position:absolute;background:#fff;border-radius:50%;opacity:0;animation:snowfall linear infinite}
+@keyframes snowfall{0%{transform:translateY(-10px) translateX(0) rotate(0);opacity:0}10%{opacity:.8}90%{opacity:.6}100%{transform:translateY(420px) translateX(60px) rotate(360deg);opacity:0}}
+
+.hero-content{position:relative;z-index:2;text-align:center;max-width:600px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);padding:6px 18px;border-radius:50px;color:var(--glow);font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.2rem}
+.hero-badge .dot{width:6px;height:6px;background:var(--ember);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,7vw,3.8rem);font-weight:700;color:#fff;line-height:1.1;margin-bottom:.6rem;letter-spacing:-.02em}
+.hero h1 span{display:block;font-size:.45em;font-family:'Outfit',sans-serif;font-weight:300;letter-spacing:.15em;color:var(--glow);margin-top:.3rem;text-transform:uppercase}
+.hero-details{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.5rem;margin-top:1.4rem;font-size:.88rem;color:rgba(255,255,255,.7)}
+.hero-details strong{color:#fff;font-weight:500}
+
+/* ═══ PROGRESS ═══ */
+.progress-wrap{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:10px 1rem;transition:box-shadow .3s}
+.progress-wrap.scrolled{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.progress-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.progress-label{font-size:.75rem;font-weight:600;color:var(--muted);white-space:nowrap}
+.progress-bar{flex:1;height:5px;background:var(--line);border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--ice),var(--ember));border-radius:10px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.progress-pct{font-size:.75rem;font-weight:700;color:var(--sky);min-width:32px;text-align:right}
+
+/* ═══ CONTAINER ═══ */
+.container{max-width:700px;margin:-2rem auto 4rem;padding:0 1rem;position:relative;z-index:2}
+
+/* ═══ CARDS ═══ */
+.card{background:var(--card-bg);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:var(--radius);box-shadow:0 8px 32px rgba(12,24,41,.06),0 2px 6px rgba(12,24,41,.03);padding:2rem 2.2rem;margin-bottom:1rem;opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease,box-shadow .3s}
+.card.visible{opacity:1;transform:translateY(0)}
+.card:hover{box-shadow:0 12px 40px rgba(12,24,41,.09),0 2px 8px rgba(12,24,41,.04)}
+@media(max-width:600px){.card{padding:1.5rem 1.3rem}}
+.section-tag{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sky);margin-bottom:1rem}
+.section-tag::before{content:'';width:18px;height:2px;background:linear-gradient(90deg,var(--ice),var(--ember));border-radius:2px}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:700;color:var(--text);margin-bottom:1.2rem;line-height:1.2}
+
+/* ═══ INFO ═══ */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem 2rem}
+@media(max-width:500px){.info-grid{grid-template-columns:1fr}}
+.info-item{display:flex;flex-direction:column}
+.info-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:2px}
+.info-value{font-weight:500;font-size:.92rem;color:var(--text)}
+.info-callout{margin-top:1rem;padding:1rem 1.2rem;background:linear-gradient(135deg,rgba(42,95,158,.04),rgba(74,156,216,.06));border-radius:var(--radius-sm);border-left:3px solid var(--ice);font-size:.88rem;color:var(--muted);line-height:1.7}
+.info-callout strong{color:var(--text);font-weight:600}
+
+/* ═══ FORM ═══ */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:.8rem}
+.form-row.single{grid-template-columns:1fr}
+.form-row.triple{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:750px){.form-row.triple{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.form-row,.form-row.triple{grid-template-columns:1fr}}
+.field{position:relative;display:flex;flex-direction:column}
+.field label{font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:5px;transition:color .2s}
+.field label .req{color:var(--ember);margin-left:2px}
+.field input,.field textarea{border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:.7rem .9rem;font-family:'Outfit',sans-serif;font-size:.95rem;color:var(--text);background:var(--white);transition:all .25s ease;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--ice);box-shadow:0 0 0 3px rgba(74,156,216,.15),0 2px 8px rgba(74,156,216,.08)}
+.field textarea{resize:vertical;min-height:80px}
+.field.error input,.field.error textarea{border-color:var(--ember);box-shadow:0 0 0 3px rgba(232,93,58,.12);animation:shake .4s ease}
+.field.error label{color:var(--ember)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+.error-msg{font-size:.73rem;color:var(--ember);margin-top:3px;display:none;font-weight:500}
+.field.error .error-msg{display:block}
+.phone-note{grid-column:1/-1;font-size:.78rem;color:var(--faint);font-style:italic;padding:4px 0 0}
+
+/* ═══ CLAUSES ═══ */
+.clauses{list-style:none;padding:0;counter-reset:clause}
+.clauses li{counter-increment:clause;font-size:.86rem;color:var(--muted);line-height:1.7;padding:.65rem 0;border-bottom:1px solid rgba(212,223,233,.5);display:flex;gap:.7rem;transition:background .2s}
+.clauses li:last-child{border-bottom:none}
+.clauses li:hover{background:rgba(74,156,216,.03);margin:0 -.5rem;padding-left:.5rem;padding-right:.5rem;border-radius:6px}
+.clauses li::before{content:counter(clause);display:flex;align-items:center;justify-content:center;min-width:24px;height:24px;background:linear-gradient(135deg,var(--ridge),var(--sky));color:#fff;border-radius:7px;font-size:.72rem;font-weight:700;flex-shrink:0;margin-top:2px}
+
+/* ═══ SIGNATURES ═══ */
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:500px){.sig-grid{grid-template-columns:1fr}}
+.sig-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.sig-wrapper{position:relative;border:2px dashed var(--line);border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--peak) 0%,var(--white) 100%);height:130px;cursor:crosshair;touch-action:none;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.sig-wrapper:hover{border-color:var(--ice);box-shadow:0 0 0 3px rgba(74,156,216,.08)}
+.sig-wrapper.active{border-color:var(--sky);border-style:solid;box-shadow:0 0 0 3px rgba(74,156,216,.15)}
+.sig-wrapper canvas{display:block;width:100%;height:100%}
+.sig-placeholder{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--faint);font-size:.82rem;pointer-events:none;transition:opacity .3s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.sig-placeholder svg{opacity:.4}
+.sig-wrapper.has-content .sig-placeholder{opacity:0}
+.sig-clear{position:absolute;top:6px;right:6px;background:var(--white);border:1px solid var(--line);border-radius:8px;padding:3px 10px;font-size:.7rem;font-weight:600;color:var(--muted);cursor:pointer;z-index:2;opacity:0;transition:opacity .2s,background .2s;font-family:'Outfit',sans-serif}
+.sig-wrapper:hover .sig-clear,.sig-wrapper.has-content .sig-clear{opacity:1}
+.sig-clear:hover{background:var(--snow);color:var(--ember)}
+.date-row{display:flex;align-items:center;gap:10px;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)}
+.date-row label{font-size:.82rem;font-weight:600;color:var(--muted)}
+.date-row input{border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:.5rem .8rem;font-family:'Outfit',sans-serif;font-size:.9rem;color:var(--text);outline:none;transition:border-color .2s}
+.date-row input:focus{border-color:var(--ice)}
+
+/* ═══ DOWNLOAD ═══ */
+.download-section{text-align:center}
+.btn-download{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:1.1rem 2rem;background:linear-gradient(135deg,var(--ember) 0%,var(--ember-glow) 100%);color:#fff;border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:.02em;cursor:pointer;overflow:hidden;transition:transform .2s,box-shadow .3s;box-shadow:0 6px 24px rgba(232,93,58,.3),0 2px 8px rgba(232,93,58,.15)}
+.btn-download::before{content:'';position:absolute;top:0;left:-100%;width:200%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transition:left .6s}
+.btn-download:hover::before{left:100%}
+.btn-download:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(232,93,58,.35),0 4px 12px rgba(232,93,58,.2)}
+.btn-download:active{transform:translateY(0)}
+.btn-download:disabled{opacity:.6;cursor:wait;transform:none}
+.btn-download svg{flex-shrink:0}
+.status-msg{text-align:center;margin-top:.8rem;font-size:.85rem;min-height:1.4rem;font-weight:500}
+.status-msg.success{color:#2a8a4e}
+.status-msg.error{color:var(--ember)}
+
+/* ═══ TOAST ═══ */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--text);color:#fff;padding:14px 24px;border-radius:12px;font-size:.88rem;font-weight:500;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.2);transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+.footer{text-align:center;padding:2rem 1rem;font-size:.78rem;color:var(--faint);border-top:1px solid var(--line)}
+.footer strong{color:var(--muted);font-weight:600}
+
+@keyframes heroFade{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero-content{animation:heroFade 1s ease-out .3s both}
+.hero-badge{animation:heroFade .8s ease-out .1s both}
+
+/* Bagaj checklist */
+.bag-card{
+  margin-top:.9rem;
+  border:1px solid rgba(212,223,233,.9);
+  background:rgba(255,255,255,0.72);
+  border-radius:16px;
+  padding:.9rem .9rem .85rem;
+  box-shadow: 0 10px 30px rgba(12,24,41,0.08);
+}
+.bag-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.8rem;
+  margin-bottom:.7rem;
+}
+.bag-title{
+  font-weight:800;
+  letter-spacing:.2px;
+  color:var(--deep);
+}
+.bag-actions{display:flex; gap:.5rem; flex-wrap:wrap;}
+.mini-btn{
+  appearance:none;
+  border:1px solid rgba(42,95,158,.28);
+  background:rgba(111,195,247,.18);
+  color:var(--deep);
+  border-radius:999px;
+  padding:.38rem .62rem;
+  font-weight:700;
+  font-size:.82rem;
+  cursor:pointer;
+  transition: transform .08s ease, background .12s ease, border-color .12s ease;
+}
+.mini-btn:hover{background:rgba(111,195,247,.26); border-color:rgba(42,95,158,.38)}
+.mini-btn:active{transform: translateY(1px)}
+.mini-btn.ghost{background:rgba(255,255,255,.35)}
+.bag-checklist{
+  display:flex;
+  flex-direction:column;
+  gap:.45rem;
+}
+.bag-item{
+  display:flex;
+  gap:.6rem;
+  align-items:flex-start;
+  padding:.55rem .6rem;
+  border-radius:12px;
+  border:1px solid rgba(212,223,233,.75);
+  background:rgba(255,255,255,0.55);
+}
+.bag-item:hover{border-color:rgba(148,167,188,.9)}
+.bag-item input{
+  margin-top:.18rem;
+  width:18px;
+  height:18px;
+  flex:0 0 18px;
+  accent-color: var(--ice);
+}
+.bag-item span{
+  color:var(--text);
+  line-height:1.25rem;
+  font-size:.95rem;
+}
+.bag-notes{margin-top:.75rem; display:grid; gap:.5rem;}
+.bag-notes .note{
+  padding:.6rem .7rem;
+  border-radius:12px;
+  background:rgba(248,251,255,0.72);
+  border:1px dashed rgba(148,167,188,.65);
+  color:var(--muted);
+  line-height:1.25rem;
+  font-size:.93rem;
+}
+
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="snow-container" id="snowContainer"></div>
+  <div class="mountains">
+    <svg viewBox="0 0 1440 180" preserveAspectRatio="none" fill="none">
+      <path d="M0 180 L0 120 L120 80 L240 110 L360 50 L480 90 L560 30 L680 70 L760 20 L860 60 L960 35 L1060 75 L1160 25 L1260 65 L1340 40 L1440 80 L1440 180Z" fill="rgba(27,53,86,0.5)"/>
+      <path d="M0 180 L0 140 L100 110 L200 130 L320 85 L440 115 L540 70 L660 100 L780 55 L880 85 L1000 60 L1100 95 L1220 50 L1340 80 L1440 100 L1440 180Z" fill="rgba(42,95,158,0.3)"/>
+      <path d="M0 180 L0 155 L180 135 L360 150 L500 125 L640 145 L800 120 L960 140 L1100 130 L1260 145 L1440 135 L1440 180Z" fill="var(--peak)"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span> Editia 2026</div>
+    <h1>Ski Camp Rausor <span>Parcul National Retezat</span></h1>
+    <div class="hero-details">
+      <span><strong>8–13 Februarie</strong></span>
+      <span>Cabana Carina</span>
+      <span>Smart Kids Study Club</span>
+    </div>
+  </div>
+</section>
+
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-inner">
+    <span class="progress-label">Completare formular</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="card" data-reveal>
+    <div class="section-tag">Detalii organizare</div>
+    <div class="card-title">Informatii Tabara</div>
+    <div class="info-grid">
+      <div class="info-item"><span class="info-label">Locatie</span><span class="info-value">Cabana Carina, Rausor</span></div>
+      <div class="info-item"><span class="info-label">Organizator</span><span class="info-value">Smart Kids Study Club Timisoara</span></div>
+      <div class="info-item"><span class="info-label">Sosire</span><span class="info-value">Duminica, 8 Feb, 17:00–20:00</span></div>
+      <div class="info-item"><span class="info-label">Plecare</span><span class="info-value">Vineri, 13 Feb, ora 13:00</span></div>
+      <div class="info-item"><span class="info-label">Transport</span><span class="info-value">Individual</span></div>
+      <div class="info-item"><span class="info-label">Contact tabara</span><span class="info-value">0733 830 503</span></div>
+    </div>
+    <div class="info-callout">
+      <strong>Insotitori:</strong> Diana-Silvia Craciunean, Mihaela Gorban, Cristi Balarie, Giuliano Pilati<br>
+      <strong>Monitori Ski acreditati:</strong> Florin Craciunean (Salvator Montan, Paramedic), Sorin Scorobete (Salvator Montan, Instructor Scoala Nationala Salvamont), Miklos Gabi (Salvator Montan, Paramedic)
+    </div>
+  </div>
+
+  <div class="card" data-reveal>
+    <div class="section-tag">Program zilnic</div>
+    <div class="card-title">Activitati & Mese</div>
+    <div class="info-grid">
+      <div class="info-item"><span class="info-label">Ski (10:00–16:00)</span><span class="info-value">20h Scoala de Ski, 4–6h/zi</span></div>
+      <div class="info-item"><span class="info-label">Recreere</span><span class="info-value">Inviorare, plimbari, jocuri, socializare</span></div>
+    </div>
+    <div class="info-callout" style="margin-top:.8rem"><strong>Mese:</strong> Mic dejun 08–09 · Pranz 13–14 · Gustare calda 17–18 · Cina 20–21</div>
+
+    <div class="bag-card" style="margin-top:.9rem">
+      <div class="bag-head">
+        <div class="bag-title">Lista bagaj (checklist)</div>
+        <div class="bag-actions">
+          <button type="button" class="mini-btn" id="bagCheckAll">Bifeaza tot</button>
+          <button type="button" class="mini-btn ghost" id="bagUncheckAll">Debifeaza</button>
+        </div>
+      </div>
+
+      <div class="bag-checklist" role="group" aria-label="Checklist bagaj">
+        <label class="bag-item"><input type="checkbox" data-label="Echipament schi (casca, ochelari, costum impermeabil, manusi, cagula)"><span><strong>Echipament schi:</strong> casca, ochelari, costum impermeabil (pantaloni + geaca), 2 perechi manusi impermeabile, cagula subtire.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Igiena personala (prosop, periuta/pasta, gel dus/sampon, balsam buze, servetele, servetele umede, dezinfectant, deodorant)"><span><strong>Igiena personala:</strong> prosop, periuta si pasta de dinti, gel de dus/sampon, balsam de buze, servetele (aprox. 5 pachete), servetele umede (aprox. 5 mini-pachete), dezinfectant mic, deodorant (dupa caz).</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Imbracaminte cabana (pijama, trening, papuci)"><span><strong>Imbracaminte pentru cabana:</strong> pijama, trening (pantaloni + bluza cu fermoar), papuci/slapi.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Colanti/izmene termo (2)"><span><strong>Lenjerie termo:</strong> colanti/izmene – 2 buc.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Bluza termo maneca lunga (2)"><span><strong>Bluze termo:</strong> bluza de corp cu maneca lunga – 2 buc.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Polar/jacheta fleece (1)"><span><strong>Strat intermediar:</strong> polar/jacheta fleece – 1 buc.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Sosete schi (2-3 perechi)"><span><strong>Sosete schi:</strong> 2–3 perechi.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Sosete subtiri + lenjerie (4 seturi)"><span><strong>Lenjerie zilnica:</strong> sosete subtiri + lenjerie – 4 seturi.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Tricouri (2)"><span><strong>Tricouri:</strong> 2 buc.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Caciula (1)"><span><strong>Caciula:</strong> 1 buc.</span></label>
+        <label class="bag-item"><input type="checkbox" data-label="Bocanci/cizme zapada (1 pereche)"><span><strong>Incaltaminte iarna:</strong> bocanci/cizme de zapada – 1 pereche (cea cu care copilul vine incaltat la tabara).</span></label>
+      </div>
+
+      <div class="bag-notes" aria-label="Note bagaj">
+        <div class="note"><strong>Recomandare (copiii mici):</strong> o pereche suplimentara de pantaloni de schi, pentru situatii neprevazute.</div>
+        <div class="note"><strong>Etichetare:</strong> va rugam sa treceti numele copilului pe eticheta hainelor si pe obiectele personale, pentru identificare usoara.</div>
+        <div class="note"><strong>Echipament tabara:</strong> schiurile si claparii sunt asigurate de tabara. Cine are echipament personal poate veni cu acesta.</div>
+        <div class="note"><strong>Bani si alimente:</strong> nu este necesar sa aiba bani la ei si nici gustari/provizii in bagaj (dulciuri, chipsuri etc.).</div>
+        <div class="note"><strong>Optional:</strong> carti, jocuri, carti de colorat. Telefon/tableta sunt permise pe propria raspundere, cu continut descarcat in prealabil (conexiune wi-fi limitata).</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card" data-reveal>
+    <div class="section-tag">Participant</div>
+    <div class="card-title">Date Copil</div>
+    <div class="form-row">
+      <div class="field" id="f_childName"><label>Numele si prenumele copilului <span class="req">*</span></label><input type="text" id="childName" data-track placeholder="ex: Popescu Maria" required><span class="error-msg">Acest camp este obligatoriu</span></div>
+      <div class="field" id="f_childAge"><label>Varsta <span class="req">*</span></label><input type="number" id="childAge" data-track placeholder="ex: 12" min="4" max="18" required><span class="error-msg">Introduceti varsta copilului</span></div>
+    </div>
+  </div>
+
+  <div class="card" data-reveal>
+    <div class="section-tag">Familie</div>
+    <div class="card-title">Date Parinti / Tutore Legal</div>
+    <div class="form-row triple">
+      <div class="field"><label>Mama</label><input type="text" id="motherName" data-track placeholder="Nume si prenume"></div>
+      <div class="field"><label>Tata</label><input type="text" id="fatherName" data-track placeholder="Nume si prenume"></div>
+      <div class="field"><label>Tutore</label><input type="text" id="guardianName" data-track placeholder="Nume si prenume"></div>
+    </div>
+    <div class="form-row single"><div class="field"><label>Regim medical / dieta / medicatie / aparate auditive-vizuale</label><textarea id="medicalInfo" data-track placeholder="Daca nu este cazul, scrieti Nu este cazul "></textarea></div></div>
+    <div class="form-row triple" id="phoneRow">
+      <div class="field" id="f_motherPhone"><label>Telefon Mama <span class="req">*</span></label><input type="tel" id="motherPhone" data-track placeholder="07xx xxx xxx"><span class="error-msg">Completati numarul</span></div>
+      <div class="field" id="f_fatherPhone"><label>Telefon Tata <span class="req">*</span></label><input type="tel" id="fatherPhone" data-track placeholder="07xx xxx xxx"><span class="error-msg">Completati numarul</span></div>
+      <div class="field" id="f_guardianPhone"><label>Telefon Tutore <span class="req">*</span></label><input type="tel" id="guardianPhone" data-track placeholder="07xx xxx xxx"><span class="error-msg">Completati numarul</span></div>
+      <p class="phone-note">Cel putin un numar de telefon trebuie completat obligatoriu.</p>
+    </div>
+    <div class="form-row single"><div class="field"><label>Contact suplimentar (Facebook / Email)</label><input type="text" id="extraContact" data-track placeholder="Email sau profil Facebook"></div></div>
+  </div>
+
+  <div class="card" data-reveal>
+    <div class="section-tag">Document legal</div>
+    <div class="card-title">Acordul Parintilor / Tutorelui Legal</div>
+    <p style="font-size:.86rem;color:var(--muted);margin-bottom:1rem">In calitate de parinte / tutore legal, prin semnarea prezentului acord:</p>
+    <ol class="clauses">
+      <li>Inteleg ca exista riscul de vatamare asociat activitatilor fizice si sportive mentionate mai sus si sunt de acord ca propriul meu copil sa participe la acestea. Prin semnarea acestui acord inteleg sa renunt la dreptul de a solicita despagubiri de orice natura ca urmare a producerii unui accident sau imbolnavire.</li>
+      <li>Inteleg ca este la latitudinea mea sa inchei o polita de asigurare pe numele copilului meu, in cazul in care doresc.</li>
+      <li>Inteleg ca insotitorii nu sunt responsabili pentru pierderea sau distrugerea obiectelor de valoare, a echipamentului sau a altor obiecte personale cu care vine copilul asupra lui in tabara.</li>
+      <li>Ma oblig sa specific regimul medical permanent sau temporar al copilului meu, inclusiv regimul de dieta, cel de medicatie si/sau necesitatea utilizarii aparatelor auditive sau vizuale.</li>
+      <li>Sunt de acord ca, in cazul unei urgente de vatamare sau imbolnavire a copilului, insotitorul sa ma instiinteze imediat, sa ia legatura cu o unitate medicala specializata, sa actioneze in numele meu si sa obtina tratamentul medical al copilului. Ma oblig sa platesc suma aferenta, in cazul administrarii unui tratament medical contra cost.</li>
+      <li>Declar ca in ultimele 24 de ore niciun membru al familiei nu a avut simptome specifice Covid, raceala, viroza, gripa.</li>
+      <li>Sunt de acord ca propriul meu copil sa se comporte civilizat si responsabil, sa respecte regulile stabilite si accept consecintele in situatia in care nu se va comporta ca atare.</li>
+      <li>Accept ca sunt responsabil pentru aducerea si preluarea copilului la ora si locatia precizata.</li>
+      <li>Accept ca ramane la latitudinea organizatorului sa modifice aspecte legate de cazare si alte servicii, dupa cum considera necesar. Inteleg ca voi fi informat asupra acestor modificari cu cel putin 24 de ore inaintea plecarii.</li>
+      <li>Sunt de acord ca organizatorul nu poate fi responsabil pentru actiunile tertilor (operator cablu ski, unitate de cazare, restaurant, etc.) care isi ofera serviciile pe parcursul taberei.</li>
+      <li>Sunt de acord si inteleg ca sunt responsabil pentru faptele copilului meu. Inteleg faptul ca participantii care nu respecta regulamentul de organizare, functionare si regulamentul intern pot sa fie exclusi de pe lista participantilor la astfel de evenimente viitoare.</li>
+      <li>Sunt de acord ca, in cazul in care copilul meu comite o fapta grava pe perioada taberei, ramane la latitudinea organizatorului sa imi trimita copilul acasa, eu fiind informat asupra acestui lucru in prealabil. In acest caz, voi suporta toate cheltuielile ocazionate de plecarea lui anterioara si nu voi solicita returnarea niciunei sume din partea organizatorului. In cazul copilului minor, voi veni sa imi preiau copilul si voi suporta toate cheltuielile ocazionate de plecarea lui anterioara anticipata, fara a solicita returnarea niciunei sume din partea organizatorului.</li>
+      <li>Sunt de acord ca propriul meu copil sa participe in aceasta tabara si ma oblig sa-i aduca la cunostinta regulile si programul.</li>
+    </ol>
+  </div>
+
+  <div class="card" data-reveal>
+    <div class="section-tag">Semnaturi olograf</div>
+    <div class="card-title">Semnati in cadranele de mai jos</div>
+    <p style="font-size:.84rem;color:var(--faint);margin-bottom:1.2rem">Folositi degetul pe touchscreen sau mouse-ul. Semnati cat mai centrat in cadran.</p>
+    <div class="sig-grid">
+      <div class="sig-section">
+        <div class="sig-label">Parinte / Tutore</div>
+        <div class="sig-wrapper" id="sigParent">
+          <span class="sig-placeholder"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-1.414.95l-3.414 1.136 1.136-3.414a4 4 0 01.95-1.414z"/></svg>Semnati aici</span>
+          <button class="sig-clear" onclick="clearSig('cParent')">sterge</button>
+          <canvas id="cParent"></canvas>
+        </div>
+      </div>
+      <div class="sig-section">
+        <div class="sig-label">Copil</div>
+        <div class="sig-wrapper" id="sigChild">
+          <span class="sig-placeholder"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-1.414.95l-3.414 1.136 1.136-3.414a4 4 0 01.95-1.414z"/></svg>Semnati aici</span>
+          <button class="sig-clear" onclick="clearSig('cChild')">sterge</button>
+          <canvas id="cChild"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="date-row"><label>Data semnarii:</label><input type="date" id="signDate"></div>
+  </div>
+
+  <div class="card download-section" data-reveal>
+    <button class="btn-download" id="downloadBtn" onclick="handleDownload()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Descarca PDF
+    </button>
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<footer class="footer"><strong>Smart Kids Study Club Timisoara</strong> · Ski Camp Rausor 2026</footer>
+
+<script>
+/* ═══ Snow ═══ */
+!function(){const c=document.getElementById('snowContainer');for(let i=0;i<40;i++){const s=document.createElement('div');s.className='snowflake';const sz=Math.random()*3+1;s.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+Math.random()*100+'%;top:-10px;animation-duration:'+(Math.random()*4+4)+'s;animation-delay:'+(Math.random()*6)+'s;';c.appendChild(s)}}();
+
+/* ═══ Scroll Reveal ═══ */
+const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*60);obs.unobserve(e.target)}})},{threshold:.1});
+document.querySelectorAll('[data-reveal]').forEach(el=>obs.observe(el));
+
+/* ═══ Progress ═══ */
+const tracked=document.querySelectorAll('[data-track]');
+function updateProgress(){let f=0;tracked.forEach(inp=>{if(inp.value.trim())f++});let sc=0;Object.values(pads).forEach(p=>{if(!p.empty())sc++});const t=tracked.length+2;const pct=Math.round(((f+sc)/t)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressPct').textContent=pct+'%'}
+tracked.forEach(el=>el.addEventListener('input',updateProgress));
+window.addEventListener('scroll',()=>{document.getElementById('progressWrap').classList.toggle('scrolled',window.scrollY>50)});
+
+/* ═══ Signature Pads ═══ */
+class SigPad{constructor(cId,wId){this.c=document.getElementById(cId);this.w=document.getElementById(wId);this.ctx=this.c.getContext('2d');this.on=false;this.has=false;this.pts=[];this.resize();window.addEventListener('resize',()=>this.resize());this.c.addEventListener('mousedown',e=>this.start(e));this.c.addEventListener('mousemove',e=>this.move(e));this.c.addEventListener('mouseup',()=>this.end());this.c.addEventListener('mouseleave',()=>this.end());this.c.addEventListener('touchstart',e=>{e.preventDefault();this.start(e.touches[0])},{passive:false});this.c.addEventListener('touchmove',e=>{e.preventDefault();this.move(e.touches[0])},{passive:false});this.c.addEventListener('touchend',e=>{e.preventDefault();this.end()},{passive:false})}resize(){const r=this.w.getBoundingClientRect(),d=devicePixelRatio||1;this.c.width=r.width*d;this.c.height=r.height*d;this.ctx.scale(d,d);this.ctx.strokeStyle='#1b3556';this.ctx.lineWidth=2.2;this.ctx.lineCap='round';this.ctx.lineJoin='round';if(this.pts.length)this.redraw()}pos(e){const r=this.c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}start(e){this.on=true;this.w.classList.add('active');const p=this.pos(e);this.pts.push([p]);this.ctx.beginPath();this.ctx.moveTo(p.x,p.y)}move(e){if(!this.on)return;const p=this.pos(e);this.pts[this.pts.length-1].push(p);this.ctx.lineTo(p.x,p.y);this.ctx.stroke();if(!this.has){this.has=true;this.w.classList.add('has-content');updateProgress()}}end(){this.on=false;this.w.classList.remove('active')}redraw(){const d=devicePixelRatio||1;this.ctx.clearRect(0,0,this.c.width/d,this.c.height/d);for(const s of this.pts){if(s.length<1)continue;this.ctx.beginPath();this.ctx.moveTo(s[0].x,s[0].y);for(let i=1;i<s.length;i++)this.ctx.lineTo(s[i].x,s[i].y);this.ctx.stroke()}}clear(){this.pts=[];this.has=false;this.w.classList.remove('has-content');const d=devicePixelRatio||1;this.ctx.clearRect(0,0,this.c.width/d,this.c.height/d);updateProgress()}empty(){return!this.has}img(){return this.c.toDataURL('image/png')}}
+const pads={cParent:new SigPad('cParent','sigParent'),cChild:new SigPad('cChild','sigChild')};
+function clearSig(id){pads[id].clear()}
+document.getElementById('signDate').valueAsDate=new Date();
+
+/* ═══ Toast ═══ */
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
+
+/* ═══ Validation ═══ */
+function validate(){let ok=true;document.querySelectorAll('.field.error').forEach(f=>f.classList.remove('error'));const cn=document.getElementById('childName').value.trim();const ca=document.getElementById('childAge').value.trim();const pm=document.getElementById('motherPhone').value.trim();const pf=document.getElementById('fatherPhone').value.trim();const pg=document.getElementById('guardianPhone').value.trim();if(!cn){document.getElementById('f_childName').classList.add('error');ok=false}if(!ca){document.getElementById('f_childAge').classList.add('error');ok=false}if(!pm&&!pf&&!pg){document.getElementById('f_motherPhone').classList.add('error');document.getElementById('f_fatherPhone').classList.add('error');document.getElementById('f_guardianPhone').classList.add('error');ok=false}if(!ok){const fe=document.querySelector('.field.error');if(fe)fe.scrollIntoView({behavior:'smooth',block:'center'});showToast('Completati campurile obligatorii si cel putin un numar de telefon.')}return ok}
+
+function handleDownload(){if(!validate())return;generatePDF()}
+
+function getCheckedBagItems(){
+  const boxes = Array.from(document.querySelectorAll('.bag-checklist input[type="checkbox"]'));
+  return boxes.filter(b=>b.checked).map(b=>b.dataset.label || '').filter(Boolean);
+}
+
+(function initBagChecklist(){
+  const btnAll = document.getElementById('bagCheckAll');
+  const btnNone = document.getElementById('bagUncheckAll');
+  const boxes = Array.from(document.querySelectorAll('.bag-checklist input[type="checkbox"]'));
+  if(btnAll) btnAll.addEventListener('click', ()=>boxes.forEach(b=>b.checked=true));
+  if(btnNone) btnNone.addEventListener('click', ()=>boxes.forEach(b=>b.checked=false));
+})();
+
+
+/* ═══ PDF ═══ */
+function generatePDF(){const btn=document.getElementById('downloadBtn');const msg=document.getElementById('statusMsg');btn.disabled=true;msg.textContent='Se genereaza PDF-ul...';msg.className='status-msg';
+setTimeout(()=>{try{const{jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');const W=210,H=297,ML=16,MR=16,PW=W-ML-MR;let y=0;
+const V={child:document.getElementById('childName').value.trim(),age:document.getElementById('childAge').value.trim(),mother:document.getElementById('motherName').value.trim(),father:document.getElementById('fatherName').value.trim(),guardian:document.getElementById('guardianName').value.trim(),medical:document.getElementById('medicalInfo').value.trim()||'Nu este cazul',phoneM:document.getElementById('motherPhone').value.trim(),phoneF:document.getElementById('fatherPhone').value.trim(),phoneG:document.getElementById('guardianPhone').value.trim(),extra:document.getElementById('extraContact').value.trim(),date:document.getElementById('signDate').value};
+const B=s=>{pdf.setFont('helvetica','bold');pdf.setFontSize(s)};const N=s=>{pdf.setFont('helvetica','normal');pdf.setFontSize(s)};const TC=(r,g,b)=>pdf.setTextColor(r,g,b);const DC=(r,g,b)=>pdf.setDrawColor(r,g,b);const FC=(r,g,b)=>pdf.setFillColor(r,g,b);function hline(yy){DC(210,218,228);pdf.setLineWidth(0.3);pdf.line(ML,yy,W-MR,yy)}function need(h){if(y+h>H-14){pdf.addPage();y=16}}
+
+// HEADER
+FC(12,24,41);pdf.rect(0,0,W,42,'F');FC(19,36,61);pdf.rect(0,28,W,14,'F');
+B(11);TC(74,156,216);pdf.text('EDITIA 2026',W/2,11,{align:'center'});
+B(22);TC(255,255,255);pdf.text('SKI CAMP RAUSOR',W/2,22,{align:'center'});
+N(8.5);TC(148,178,216);pdf.text('Parcul National Retezat   |   Domeniul Schiabil Clif Alpin Rausor   |   Cabana Carina',W/2,33,{align:'center'});
+N(8);TC(130,160,200);pdf.text('8 Februarie (18:00) - 13 Februarie (13:00)   |   Organizator: Smart Kids Study Club Timisoara   |   Tel: 0733 830 503',W/2,39,{align:'center'});
+y=50;
+
+// INFO
+B(9.5);TC(42,95,158);pdf.text('INFORMATII TABARA',ML,y);y+=6;
+[['Insotitori:','Diana-Silvia Craciunean, Mihaela Gorban, Cristi Balarie, Giuliano Pilati'],['Monitori Ski:','Florin Craciunean (Salvator Montan, Paramedic), Sorin Scorobete (Salvator Montan, Instructor Scoala Nationala Salvamont), Miklos Gabi (Salvator Montan, Paramedic)'],['Transport:','Individual (nu intra in sarcina organizatorului)']].forEach(([lbl,val])=>{B(8);TC(30,41,59);pdf.text(lbl,ML,y);const lw=pdf.getTextWidth(lbl)+1.5;N(8);TC(71,85,105);const vl=pdf.splitTextToSize(val,PW-lw);pdf.text(vl,ML+lw,y);y+=vl.length*3.5+1});y+=2;
+
+// Program box
+FC(245,248,252);DC(220,228,238);pdf.setLineWidth(0.2);pdf.roundedRect(ML,y,PW,16,1.5,1.5,'FD');B(7.5);TC(42,95,158);pdf.text('PROGRAM',ML+4,y+4.5);N(7.5);TC(71,85,105);pdf.text('Activitati sportive: 20 ore Scoala de Ski (4-6 ore/zi, interval 10:00-16:00, in functie de vreme)',ML+4,y+9);pdf.text('Mese: Mic dejun 08-09  |  Pranz 13-14  |  Gustare calda 17-18  |  Cina 20-21  |  Recreere zilnica',ML+4,y+13);y+=22;
+
+N(7);TC(130,145,165);const echip='Echipament necesar: casca protectie, ochelari ski, cagula, manusi impermeabile, costum ski, sosete lungi, pantaloni/bluza termo, trening interior, papuci interior, bocanci, haine de schimb zilnic, prosoape, obiecte igiena personala, medicamente etichetate (se predau supraveghetorilor). Copiii pot avea in bagaj: jocuri, carti, telefon, tableta/laptop (responsabilitate proprie).';const eL=pdf.splitTextToSize(echip,PW);
+pdf.text(eL,ML,y);
+y+=eL.length*2.8+3;
+
+// Checklist bagaj (daca e bifat ceva in formular)
+const bagChecked = getCheckedBagItems();
+if(bagChecked.length){
+  N(7.2);TC(130,145,165);
+  const head='Checklist bagaj (bifat de parinte):';
+  need(10);
+  pdf.text(head,ML,y); y+=4;
+  const bullets = bagChecked.map(t=>'• '+t).join('\n');
+  const bL = pdf.splitTextToSize(bullets, PW-2);
+  pdf.text(bL, ML, y);
+  y += bL.length*3.0 + 2;
+}else{
+  y+=2;
+}
+
+hline(y);y+=8;
+
+// ACORD
+B(13);TC(30,41,59);pdf.text('ACORDUL PARINTILOR / TUTORELUI LEGAL',W/2,y,{align:'center'});y+=5;N(9);TC(42,95,158);pdf.text('pentru participare Ski Camp Rausor 2026',W/2,y,{align:'center'});y+=9;
+
+// DATE BOX
+FC(245,248,252);pdf.roundedRect(ML,y-3,PW,18,1.5,1.5,'F');
+B(8.5);TC(71,85,105);pdf.text('Copil:',ML+3,y+1);N(9);TC(30,41,59);pdf.text(V.child,ML+16,y+1);DC(200,210,225);pdf.setLineWidth(0.2);pdf.line(ML+16,y+2.5,ML+PW*0.6,y+2.5);
+B(8.5);TC(71,85,105);pdf.text('Varsta:',ML+PW*0.65,y+1);N(9);TC(30,41,59);pdf.text(V.age,ML+PW*0.65+15,y+1);pdf.line(ML+PW*0.65+15,y+2.5,ML+PW-3,y+2.5);
+const r2y=y+8;const colW=(PW-12)/3;
+[['Mama:',V.mother],['Tata:',V.father],['Tutore:',V.guardian]].forEach(([lbl,val],i)=>{const cx=ML+3+i*(colW+4);B(8);TC(71,85,105);pdf.text(lbl,cx,r2y);const lw=pdf.getTextWidth(lbl)+1.5;N(8.5);TC(30,41,59);pdf.text(val||'',cx+lw,r2y);DC(200,210,225);pdf.line(cx+lw,r2y+1.2,cx+colW,r2y+1.2)});
+y+=22;
+
+// CLAUSES
+B(8.5);TC(30,41,59);pdf.text('In calitate de parinte / tutore legal:',ML,y);y+=5;
+const clauses=['Inteleg ca exista riscul de vatamare asociat activitatilor fizice si sportive mentionate mai sus si sunt de acord ca propriul meu copil sa participe la acestea. Prin semnarea acestui acord inteleg sa renunt la dreptul de a solicita despagubiri de orice natura ca urmare a producerii unui accident sau imbolnavire.','Inteleg ca este la latitudinea mea sa inchei o polita de asigurare pe numele copilului meu, in cazul in care doresc.','Inteleg ca insotitorii nu sunt responsabili pentru pierderea sau distrugerea obiectelor de valoare, a echipamentului sau a altor obiecte personale cu care vine copilul asupra lui in tabara.','Ma oblig sa specific regimul medical permanent sau temporar al copilului meu, inclusiv regimul de dieta, cel de medicatie si/sau necesitatea utilizarii aparatelor auditive sau vizuale, dupa cum urmeaza:','Sunt de acord ca, in cazul unei urgente de vatamare sau imbolnavire a copilului, insotitorul sa ma instiinteze imediat, sa ia legatura cu o unitate medicala specializata, sa actioneze in numele meu si sa obtina tratamentul medical al copilului. Ma oblig sa platesc suma aferenta, in cazul administrarii unui tratament medical contra cost.','Declar ca in ultimele 24 de ore niciun membru al familiei nu a avut simptome specifice Covid, raceala, viroza, gripa.','Sunt de acord ca propriul meu copil sa se comporte civilizat si responsabil, sa respecte regulile stabilite si accept consecintele in situatia in care nu se va comporta ca atare.','Accept ca sunt responsabil pentru aducerea si preluarea copilului la ora si locatia precizata.','Accept ca ramane la latitudinea organizatorului sa modifice aspecte legate de cazare si alte servicii, dupa cum considera necesar. Inteleg ca voi fi informat asupra acestor modificari cu cel putin 24 de ore inaintea plecarii.','Sunt de acord ca organizatorul nu poate fi responsabil pentru actiunile tertilor (operator cablu ski, unitate de cazare, restaurant, etc.) care isi ofera serviciile pe parcursul taberei.','Sunt de acord si inteleg ca sunt responsabil pentru faptele copilului meu. Inteleg faptul ca participantii care nu respecta regulamentul de organizare, functionare si regulamentul intern pot sa fie exclusi de pe lista participantilor la astfel de evenimente viitoare.','Sunt de acord ca, in cazul in care copilul meu comite o fapta grava pe perioada taberei, ramane la latitudinea organizatorului sa imi trimita copilul acasa, eu fiind informat asupra acestui lucru in prealabil. In acest caz, voi suporta toate cheltuielile ocazionate de plecarea lui anterioara si nu voi solicita returnarea niciunei sume din partea organizatorului. In cazul copilului minor, voi veni sa imi preiau copilul si voi suporta toate cheltuielile ocazionate de plecarea lui anterioara anticipata, fara a solicita returnarea niciunei sume din partea organizatorului.','Sunt de acord ca propriul meu copil sa participe in aceasta tabara si ma oblig sa-i aduca la cunostinta regulile si programul.'];
+
+for(let i=0;i<clauses.length;i++){let text=clauses[i];if(i===3)text+='\n    >> '+V.medical;N(7.5);const cL=pdf.splitTextToSize(text,PW-9);const bH=cL.length*3+1.5;need(bH+2);if(i%2===0){FC(248,251,255);pdf.rect(ML,y-2.5,PW,bH+1,'F')}B(7.5);TC(42,95,158);pdf.text((i+1)+'.',ML+1,y);N(7.5);TC(71,85,105);pdf.text(cL,ML+9,y);y+=bH+0.5}
+
+y+=5;need(30);
+
+// TELEFOANE
+hline(y);y+=7;B(9);TC(30,41,59);pdf.text('TELEFOANE DE URGENTA (24h)',ML,y);y+=6;
+[['Mama:',V.phoneM],['Tata:',V.phoneF],['Tutore:',V.phoneG]].forEach(([lbl,val],i)=>{const cx=ML+i*(PW/3);B(8);TC(71,85,105);pdf.text(lbl,cx,y);const lw=pdf.getTextWidth(lbl)+2;N(8.5);TC(30,41,59);pdf.text(val||'-',cx+lw,y);DC(200,210,225);pdf.setLineWidth(0.2);pdf.line(cx+lw,y+1.2,cx+PW/3-4,y+1.2)});y+=6;
+B(8);TC(71,85,105);pdf.text('Contact suplimentar:',ML,y);const elw=pdf.getTextWidth('Contact suplimentar:')+2;N(8.5);TC(30,41,59);pdf.text(V.extra||'-',ML+elw,y);DC(200,210,225);pdf.line(ML+elw,y+1.2,W-MR,y+1.2);y+=8;
+
+// SEMNATURI
+need(85);hline(y);y+=7;B(10);TC(30,41,59);pdf.text('SEMNATURI',ML,y);N(8.5);TC(148,163,184);pdf.text('Data: '+V.date,W-MR,y,{align:'right'});y+=8;
+const sigW=(PW-10)/2,sigH=28;const sigs=[['Parinte / Tutore',pads.cParent],['Copil',pads.cChild]];
+for(let i=0;i<sigs.length;i+=2){need(sigH+12);for(let j=0;j<2;j++){if(i+j>=sigs.length)break;const[label,pad]=sigs[i+j];const sx=ML+j*(sigW+10);B(7.5);TC(71,85,105);pdf.text('Semnatura '+label+':',sx,y);FC(250,252,255);DC(200,210,225);pdf.setLineWidth(0.25);pdf.roundedRect(sx,y+2,sigW,sigH,2,2,'FD');if(!pad.empty()){try{pdf.addImage(pad.img(),'PNG',sx+2,y+3,sigW-4,sigH-2)}catch(e){}}else{DC(225,230,240);pdf.setLineWidth(0.15);pdf.line(sx+10,y+sigH-2,sx+sigW-10,y+sigH-2)}}y+=sigH+10}
+
+// FOOTER
+const pages=pdf.getNumberOfPages();for(let p=1;p<=pages;p++){pdf.setPage(p);DC(210,218,228);pdf.setLineWidth(0.2);pdf.line(ML,H-12,W-MR,H-12);N(7);TC(148,163,184);pdf.text('Smart Kids Study Club Timisoara  |  Ski Camp Rausor 2026',W/2,H-8,{align:'center'});pdf.text('Pagina '+p+' / '+pages,W-MR,H-8,{align:'right'})}
+
+const safe=(V.child||'Formular').replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');pdf.save('Acord_SkiCamp_'+safe+'_2026.pdf');
+msg.textContent='PDF descarcat cu succes!';msg.className='status-msg success';showToast('PDF-ul a fost descarcat!')}catch(err){console.error(err);msg.textContent='Eroare la generare. Incercati din nou.';msg.className='status-msg error'}btn.disabled=false},150)}
+</script>
+</body>
+</html>
