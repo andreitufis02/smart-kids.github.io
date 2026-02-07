@@ -469,10 +469,6 @@ B(9.5);TC(42,95,158);pdf.text('INFORMATII TABARA',ML,y);y+=6;
 // Program box
 FC(245,248,252);DC(220,228,238);pdf.setLineWidth(0.2);pdf.roundedRect(ML,y,PW,16,1.5,1.5,'FD');B(7.5);TC(42,95,158);pdf.text('PROGRAM',ML+4,y+4.5);N(7.5);TC(71,85,105);pdf.text('Activitati sportive: 20 ore Scoala de Ski (4-6 ore/zi, interval 10:00-16:00, in functie de vreme)',ML+4,y+9);pdf.text('Mese: Mic dejun 08-09  |  Pranz 13-14  |  Gustare calda 17-18  |  Cina 20-21  |  Recreere zilnica',ML+4,y+13);y+=22;
 
-N(7);TC(130,145,165);const echip='Echipament necesar: casca protectie, ochelari ski, cagula, manusi impermeabile, costum ski, sosete lungi, pantaloni/bluza termo, trening interior, papuci interior, bocanci, haine de schimb zilnic, prosoape, obiecte igiena personala, medicamente etichetate (se predau supraveghetorilor). Copiii pot avea in bagaj: jocuri, carti, telefon, tableta/laptop (responsabilitate proprie).';const eL=pdf.splitTextToSize(echip,PW);
-pdf.text(eL,ML,y);
-y+=eL.length*2.8+3;
-
 // Checklist bagaj (daca e bifat ceva in formular)
 const bagChecked = getCheckedBagItems();
 if(bagChecked.length){
